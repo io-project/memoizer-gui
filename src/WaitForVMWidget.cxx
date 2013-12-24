@@ -6,6 +6,11 @@ WaitForVMWidget::WaitForVMWidget(QWidget *parent) :
     setupUi(this);
 }
 
+void WaitForVMWidget::handleVmAboutToStop()
+{
+    label->setText(QString::fromUtf8("Maszyna wirtualna jest wyłączana..."));
+}
+
 void WaitForVMWidget::changeEvent(QEvent *e)
 {
     QWidget::changeEvent(e);

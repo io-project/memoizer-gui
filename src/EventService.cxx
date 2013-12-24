@@ -1,5 +1,6 @@
 #include "EventService.hxx"
 
-EventService::EventService()
+EventService::EventService(jobject eventService) :
+    JvmObject<EventService>(eventService)
 {
 }

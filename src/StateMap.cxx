@@ -1,5 +1,7 @@
 #include "StateMap.hxx"
 
-StateMap::StateMap()
+
+StateMap::StateMap(jobject stateMap) : JvmObject<StateMap>(stateMap)
 {
+
 }

@@ -1,10 +1,14 @@
 #ifndef STATEMAP_HXX
 #define STATEMAP_HXX
 
-class StateMap : public JvmObject
+#include "JvmObject.hxx"
+
+class StateMap : public JvmObject<StateMap>
 {
-public:
-    StateMap();
+    friend class JvmObject<StateMap>;
+
+private:
+    StateMap(jobject stateMap);
 };
 
 #endif // STATEMAP_HXX

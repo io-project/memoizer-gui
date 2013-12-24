@@ -1,10 +1,13 @@
 #ifndef EVENTSERVICE_HXX
 #define EVENTSERVICE_HXX
 
-class EventService : public JvmObject
+#include "JvmObject.hxx"
+
+class EventService : public JvmObject<EventService>
 {
-public:
-    EventService();
+    friend class JvmObject<EventService>;
+private:
+    EventService(jobject eventService);
 };
 
 #endif // EVENTSERVICE_HXX
