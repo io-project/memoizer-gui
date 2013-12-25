@@ -7,12 +7,11 @@
 
 #include <jni.h>
 
-#include "ViewType.hxx"
-
 class JvmException;
 class StateMap;
 class EventService;
 class PluginManager;
+class ViewType;
 
 class VirtualMachine : public QObject
 {
@@ -31,14 +30,15 @@ public:
      */
     void preparePluginsNamesForView(const ViewType& viewType);
 
+    Q_INVOKABLE void storePluginsSelection(const QStringList& selected, const QStringList& unselected);
     Q_INVOKABLE void stop();
 
 signals:
     void started();
     void objectsCreated();
-    void pluginsNames(const QStringList& pluginsNames);
-    void viewsTypes(const QList<ViewType>& viewsTypes);
-    void pluginsNamesForView(const QList<QString>& pluginsNames, const ViewType& viewType);
+    void pluginsNames(const QStringList& pluginsNames,const QStringList& selectedPlugins);
+    void viewsTypes(const QList<std::weak_ptr<const ViewType>>& viewsTypes);
+    void pluginsNamesForView(const QStringList& pluginsNames, std::weak_ptr<const ViewType> viewType);
     void initializationFailed();
     void aboutToStop();
     void stopped();
@@ -58,6 +58,9 @@ private:
     std::shared_ptr<StateMap> _stateMap;
     std::shared_ptr<EventService> _eventService;
     std::shared_ptr<PluginManager> _pluginManager;
+
+    // "Żywy" odnośnik do typu wyliczeniowego (GUI otrzymuje "miękką" kopie)
+    QList<std::shared_ptr<ViewType>> _allViewTypes;
 };
 
 #endif // VIRTUALMACHINE_HXX

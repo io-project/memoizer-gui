@@ -1,6 +1,6 @@
 #include "EventService.hxx"
 
-EventService::EventService(jobject eventService) :
-    JvmObject<EventService>(eventService)
+EventService::EventService(JNIEnv *jniEnv, jobject eventService) :
+    JvmObject<EventService>(jniEnv,eventService)
 {
 }

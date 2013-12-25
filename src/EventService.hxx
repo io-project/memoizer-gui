@@ -7,7 +7,7 @@ class EventService : public JvmObject<EventService>
 {
     friend class JvmObject<EventService>;
 private:
-    EventService(jobject eventService);
+    EventService(JNIEnv *jniEnv, jobject eventService);
 };
 
 #endif // EVENTSERVICE_HXX

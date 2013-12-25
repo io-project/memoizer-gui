@@ -1,5 +1,7 @@
 #include "MainWindow.hxx"
 
+#include <functional>
+
 #include <QtCore/QSettings>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
@@ -17,10 +19,11 @@
 #include "CentralWidget.hxx"
 #include "VirtualMachine.hxx"
 #include "JvmException.hxx"
+#include "ViewType.hxx"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), _sourcesMenu(nullptr), _wantClose(false),
-    _vmIsAlive(false)
+    _vmIsAlive(false), _viewsMenu(nullptr)
 {
     QSettings settings;
     resize(settings.value("MainWindow/size",QSize(600,400)).value<QSize>());
@@ -53,6 +56,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
     else
     {
         _vmIsAlive=false;
+        {
+            QStringList plugins[2];
+            for(const auto plugin : _allSources)
+                plugins[_sourcesSelection[plugin]]<<plugin;
+            QMetaObject::invokeMethod(
+                        _vm,"storePluginsSelection",
+                        Q_ARG(QStringList,plugins[1]),
+                        Q_ARG(QStringList,plugins[0]));
+        }
         QMetaObject::invokeMethod(_vm,"stop");
         event->ignore();
     }
@@ -60,7 +72,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::initializeMenuBar()
 {
-    menuBar()->addMenu(QString::fromUtf8("&Widok"));
+    _viewsMenu=menuBar()->addMenu(QString::fromUtf8("&Widok"));
     _sourcesMenu=menuBar()->addMenu(QString::fromUtf8("Źró&dła"));
     initializeSourcesMenu();
     initializeMoreMenu(menuBar()->addMenu(QString::fromUtf8("Więc&ej")));
@@ -80,6 +92,8 @@ void MainWindow::initializeVirtualMachine()
     _vm->moveToThread(_vmThread);
     connect(_vmThread,&QThread::started,_vm,&VirtualMachine::start);
     connect(_vm,&VirtualMachine::pluginsNames,this,&MainWindow::receivePluginsNames);
+    connect(_vm,&VirtualMachine::viewsTypes,this,&MainWindow::receiveViewTypes);
+    connect(_vm,&VirtualMachine::pluginsNamesForView,this,&MainWindow::receivePluginsNamesForView);
     connect(_vm,&VirtualMachine::initializationFailed,dynamic_cast<CentralWidget*>(centralWidget()),&CentralWidget::vmInitializationFailed);
     connect(_vm,&VirtualMachine::aboutToStop,this,&MainWindow::handleVmAboutToStop);
     connect(_vm,&VirtualMachine::stopped,_vmThread,&QThread::quit);
@@ -213,22 +227,55 @@ CreateJavaVM_t MainWindow::getCreateJavaVM()
 #endif
 }
 
-void MainWindow::receivePluginsNames(const QStringList &pluginsNames)
+void MainWindow::receivePluginsNames(const QStringList &pluginsNames, const QStringList &selectedPlugins)
 {
+    const QSet<QString> selectedPluginsS=QSet<QString>::fromList(selectedPlugins);
     QAction* separator=_sourcesMenu->actions().first();
-    for(auto plugin : pluginsNames)
+    for(const auto plugin : pluginsNames)
     {
        QAction* sourceAction=new QAction(plugin,_sourcesMenu);
        sourceAction->setCheckable(true);
        connect(sourceAction,&QAction::triggered,[this,plugin](bool checked){
            if(checked)
-               _selectedSources.append(plugin);
+               _sourcesSelection[plugin]=true;
            else
-               _selectedSources.removeOne(plugin);
+               _sourcesSelection[plugin]=false;
        });
+       if(selectedPluginsS.contains(plugin))
+           sourceAction->trigger();
        _sourcesActions.append(sourceAction);
     }
     _sourcesMenu->insertActions(separator,_sourcesActions);
+    _allSources=pluginsNames;
+}
+void MainWindow::receiveViewTypes(const QList<std::weak_ptr<const ViewType> > &viewTypes)
+{
+    if(viewTypes.isEmpty())
+        emit initializedEmpty();
+    for(const auto v : viewTypes)
+        _waitingViewTypes.insert(v.lock());
+}
+
+void MainWindow::receivePluginsNamesForView(const QStringList &pluginsNames, std::weak_ptr<const ViewType> viewType)
+{
+    auto viewTypeL=viewType.lock();
+    Q_ASSERT(viewTypeL);
+    QMenu *viewMenu=_viewsMenu->addMenu(viewTypeL->getName());
+    QAction *action=viewMenu->addAction(QString::fromUtf8("Zaznaczone źródła"));
+    connect(action,&QAction::triggered,this,[viewType,this](){showView(viewType,selectedSources());});
+    viewMenu->addSeparator();
+    for(auto plugin:pluginsNames)
+    {
+        action=viewMenu->addAction(plugin);
+        connect(action,&QAction::triggered,this,[this,plugin,viewType](){showView(viewType,QStringList(plugin));});
+    }
+    viewMenu->addSeparator();
+    action=viewMenu->addAction(QString::fromUtf8("Wszystko"));
+    connect(action,&QAction::triggered,this,[this,viewType,pluginsNames](){showView(viewType,pluginsNames);});
+
+    _waitingViewTypes.erase(viewTypeL);
+    if(_waitingViewTypes.empty())
+        emit initialized();
 }
 
 void MainWindow::selectAllSources()
@@ -237,6 +284,8 @@ void MainWindow::selectAllSources()
     {
         action->setChecked(true);
     }
+    for(const auto source : _allSources)
+        _sourcesSelection[source]=true;
 }
 
 void MainWindow::deselectAllSources()
@@ -245,6 +294,8 @@ void MainWindow::deselectAllSources()
     {
         action->setChecked(false);
     }
+    for(const auto source : _allSources)
+        _sourcesSelection[source]=false;
 }
 
 void MainWindow::releaseAllPlugins()
@@ -276,3 +327,20 @@ void MainWindow::showException(const JvmException& exception)
                           exception.whatUnicode());
 }
 
+#include <QDebug>
+
+void MainWindow::showView(std::weak_ptr<const ViewType> viewType, const QStringList &pluginsNames)
+{
+    qDebug()<<"Widok:"<<viewType.lock()->getName();
+    for(const auto p : pluginsNames)
+        qDebug()<<p;
+}
+
+QStringList MainWindow::selectedSources() const
+{
+    QStringList result;
+    for(auto source : _allSources)
+        if(_sourcesSelection[source])
+            result<<source;
+    return result;
+}

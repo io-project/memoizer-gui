@@ -24,6 +24,10 @@ set(SRC_LIST
     StateMap.cxx
     EventService.cxx
     PluginManager.cxx
+    Utilities.cxx
+    ViewTypeBuilder.cxx
+    JvmClass.cxx
+    Object.cxx
 )
 
 qt5_wrap_ui(UI_HDRS_LIST

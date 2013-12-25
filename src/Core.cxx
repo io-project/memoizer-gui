@@ -1,9 +1,12 @@
 #include "Core.hxx"
 
+#include <QtCore/QList>
+
 #include <QtWidgets/QApplication>
 
 #include "MainWindow.hxx"
 #include "JvmException.hxx"
+#include "ViewType.hxx"
 
 Core::Core()
 {
@@ -23,4 +26,6 @@ int Core::run(int argc, char *argv[])
 void Core::registerMetaTypes()
 {
     qRegisterMetaType<JvmException>();
+    qRegisterMetaType<std::weak_ptr<const ViewType>>();
+    qRegisterMetaType<QList<std::weak_ptr<const ViewType>>>();
 }

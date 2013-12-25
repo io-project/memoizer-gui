@@ -1,12 +1,19 @@
 #ifndef MAINWINDOW_HXX
 #define MAINWINDOW_HXX
 
+#include <memory>
+#include <unordered_set>
+
+#include <QtCore/QList>
+#include <QtCore/QStringList>
+
 #include <QtWidgets/QMainWindow>
 
 #include <jni.h>
 
 class VirtualMachine;
 class JvmException;
+class ViewType;
 
 typedef jint (JNICALL * CreateJavaVM_t)(JavaVM **, void **, void *);
 
@@ -20,6 +27,8 @@ public:
     void closeEvent(QCloseEvent* event) override;
 
 signals:
+    void initialized();
+    void initializedEmpty();  // Zainicjalizowano, ale nie ma plugin-ów
 
 public slots:
 
@@ -47,7 +56,9 @@ private:
 
     /* Komunikacja */
     // przenieść wyżej
-    void receivePluginsNames(const QStringList& pluginsNames);
+    void receivePluginsNames(const QStringList& pluginsNames,const QStringList& selectedPlugins);
+    void receiveViewTypes(const QList<std::weak_ptr<const ViewType>>& viewTypes);
+    void receivePluginsNamesForView(const QStringList& pluginsNames, std::weak_ptr<const ViewType> viewType);
 
     /* Obsługa akcji */
     void selectAllSources();
@@ -57,6 +68,10 @@ private:
     void showAbout();
     void showAccountsSettings();
     void showException(const JvmException &exception);
+    void showView(std::weak_ptr<const ViewType> viewType, const QStringList& pluginsNames);
+
+    /* Funkcje pomocnicze */
+    QStringList selectedSources() const;
 
 private:
     QThread* _vmThread;
@@ -64,10 +79,14 @@ private:
     bool _wantClose;
     bool _vmIsAlive;
 
+    QMenu* _viewsMenu;
+    std::unordered_set<std::shared_ptr<const ViewType>> _waitingViewTypes;
+
     QMenu* _sourcesMenu;
     QList<QAction*> _sourcesActions;
+    QStringList _allSources;
 
-    QList<QString> _selectedSources;
+    QHash<QString,bool> _sourcesSelection;
 };
 
 #endif // MAINWINDOW_HXX

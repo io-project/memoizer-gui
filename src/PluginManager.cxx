@@ -2,6 +2,9 @@
 
 #include "LocalRefsGuard.hxx"
 #include "JvmException.hxx"
+#include "ViewType.hxx"
+#include "Utilities.hxx"
+#include "ViewTypeBuilder.hxx"
 
 QStringList PluginManager::getAllPluginNames(JNIEnv *jniEnv)
 {
@@ -31,8 +34,55 @@ QStringList PluginManager::getAllPluginNames(JNIEnv *jniEnv)
     return result;
 }
 
-PluginManager::PluginManager(jobject pluginManager)
-    : JvmObject<PluginManager>(pluginManager), _pluginManagerClass(nullptr),
+QList<std::shared_ptr<ViewType> > PluginManager::getAvailableViews(JNIEnv *jniEnv)
+{
+    ensureInitialized(jniEnv);
+    LocalRefsGuard localRefs(jniEnv);
+    QList<std::shared_ptr<ViewType>> result;
+    jobject viewsList=jniEnv->CallObjectMethod(unwrap(),_getAvailableViews);
+    localRefs.checkIn(viewsList);
+    jobject iterator=jniEnv->CallObjectMethod(viewsList,_iteratorId);
+    localRefs.checkIn(iterator);
+    localRefs.remove(viewsList);
+    ViewTypeBuilder vtBuilder(jniEnv);
+    for(;;)
+    {
+        jboolean hn=jniEnv->CallBooleanMethod(iterator,_hasNextId);
+        JvmException::checkEnv(jniEnv);
+        if(!hn)
+            break;
+        jobject v=jniEnv->CallObjectMethod(iterator,_nextId);
+        result.append(vtBuilder.transferChecked(v));
+    }
+    return result;
+}
+
+QStringList PluginManager::getPluginsNamesForView(JNIEnv *jniEnv,std::shared_ptr<const ViewType> viewType)
+{
+    ensureInitialized(jniEnv);
+    LocalRefsGuard localRefs(jniEnv);
+    QStringList result;
+    jobject namesList=jniEnv->CallObjectMethod(unwrap(),_getPluginsNamesForView,viewType->unwrap());
+    localRefs.checkIn(namesList);
+    jobject iterator=jniEnv->CallObjectMethod(namesList,_iteratorId);
+    localRefs.checkIn(iterator);
+    localRefs.remove(namesList);
+    for(;;)
+    {
+        jboolean hn=jniEnv->CallBooleanMethod(iterator,_hasNextId);
+        JvmException::checkEnv(jniEnv);
+        if(!hn)
+            break;
+        jobject n=jniEnv->CallObjectMethod(iterator,_nextId);
+        localRefs.checkIn(n);
+        result<<toQString(jniEnv,reinterpret_cast<jstring>(n));
+        localRefs.remove(n);
+    }
+    return result;
+}
+
+PluginManager::PluginManager(JNIEnv *jniEnv, jobject pluginManager)
+    : JvmObject<PluginManager>(jniEnv,pluginManager), _pluginManagerClass(nullptr),
       _listClass(nullptr)
 {
 }
@@ -60,6 +110,16 @@ void PluginManager::initialize(JNIEnv *jniEnv)
                 "()Ljava/util/List;");
     if(!_getAllPluginNamesId)
         throw JvmException::fromEnv(jniEnv);
+    _getAvailableViews=jniEnv->GetMethodID(
+                _pluginManagerClass,
+                "getAvailableViews",
+                "()Ljava/util/List;");
+    check(_getAvailableViews);
+    _getPluginsNamesForView=jniEnv->GetMethodID(
+                _pluginManagerClass,
+                "getPluginsNamesForView",
+                "(Lpl/edu/uj/tcs/memoizer/plugins/EViewType;)Ljava/util/List;");
+    check(_getPluginsNamesForView);
 
     // java.util.List
     clazz=jniEnv->FindClass("java/util/List");

@@ -92,6 +92,11 @@ void VirtualMachine::start()
     prepareCommonObjects();
 }
 
+void VirtualMachine::storePluginsSelection(const QStringList& selected, const QStringList& unselected)
+{
+    _stateMap->setPluginsSelection(_jniEnv,selected,unselected);
+}
+
 void VirtualMachine::stop()
 {
     if(_javaVm)
@@ -209,6 +214,26 @@ void VirtualMachine::prepareCommonObjects()
 
 void VirtualMachine::prepareDataForGui()
 {
-    QStringList pluginsNamesL=_pluginManager->getAllPluginNames(_jniEnv);
-    emit pluginsNames(pluginsNamesL);
+    try
+    {
+        QStringList pluginsNamesL=_pluginManager->getAllPluginNames(_jniEnv);
+        QStringList selectedPluginsL=_stateMap->selectedPlugins(_jniEnv);
+        emit pluginsNames(pluginsNamesL,selectedPluginsL);
+        _allViewTypes=_pluginManager->getAvailableViews(_jniEnv);
+        QList<std::weak_ptr<const ViewType>> softViewTypes;
+        softViewTypes.reserve(_allViewTypes.size());
+        for(const auto v : _allViewTypes)
+            softViewTypes.append(v);
+        emit viewsTypes(softViewTypes);
+        for(const auto viewType: _allViewTypes)
+        {
+            auto results=_pluginManager->getPluginsNamesForView(_jniEnv,viewType);
+            emit pluginsNamesForView(results,viewType);
+        }
+    }
+    catch(const JvmException& e)
+    {
+        emit exceptionOccured(e);
+        emit initializationFailed();
+    }
 }

@@ -1,15 +1,29 @@
 #ifndef VIEWTYPE_HXX
 #define VIEWTYPE_HXX
 
-#include <jni.h>
+#include "JvmObject.hxx"
 
-class ViewType
+#include <QtCore/QList>
+#include <QtCore/QMetaType>
+
+class ViewType : public JvmObject<ViewType>
 {
+    friend class JvmObject<ViewType>;
+
 public:
-    ViewType();
+    QString getName() const;
+    bool isSearch() const;
 
 private:
-    jobject _object;
+    ViewType(JNIEnv *jniEnv, jobject viewType, const QString& name,bool isSearch);
+    ViewType(JNIEnv *jniEnv, jobject viewType, QString&& name, bool isSearch);
+
+private:
+    QString _name;
+    bool _isSearch;
 };
+
+Q_DECLARE_METATYPE(std::weak_ptr<const ViewType>);
+Q_DECLARE_METATYPE(QList<std::weak_ptr<const ViewType>>);
 
 #endif // VIEWTYPE_HXX

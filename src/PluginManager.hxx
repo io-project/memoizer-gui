@@ -3,9 +3,12 @@
 
 #include "JvmObject.hxx"
 
-#include <mutex>
+#include <memory>
 
+#include <QtCore/QList>
 #include <QtCore/QStringList>
+
+class ViewType;
 
 class PluginManager : public JvmObject<PluginManager>
 {
@@ -13,9 +16,11 @@ class PluginManager : public JvmObject<PluginManager>
 
 public:
     QStringList getAllPluginNames(JNIEnv *jniEnv);
+    QList<std::shared_ptr<ViewType> > getAvailableViews(JNIEnv *jniEnv);
+    QStringList getPluginsNamesForView(JNIEnv *jniEnv, std::shared_ptr<const ViewType> viewType);
 
 private:
-    PluginManager(jobject pluginManager);
+    PluginManager(JNIEnv *jniEnv, jobject pluginManager);
 
     virtual void initialize(JNIEnv* jniEnv) override;
     virtual void deinitialize(JNIEnv* jniEnv) override;
@@ -23,6 +28,8 @@ private:
 private:
     jclass _pluginManagerClass;
     jmethodID _getAllPluginNamesId;
+    jmethodID _getAvailableViews;
+    jmethodID _getPluginsNamesForView;
 
     jclass _listClass;
     jmethodID _iteratorId;

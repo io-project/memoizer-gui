@@ -36,17 +36,3 @@ void LocalRefsGuard::checkIn(jobject ref)
     insert(ref);
 }
 
-jobject LocalRefsGuard::toGlobalChecked(jobject ref)
-{
-    if(!ref)
-        throw JvmException::fromEnv(_jniEnv);
-    jobject r=_jniEnv->NewGlobalRef(ref);
-    if(!r)
-    {
-        _jniEnv->DeleteLocalRef(ref);
-        throw JvmException::fromEnv(_jniEnv);
-    }
-    return r;
-}
-
-
