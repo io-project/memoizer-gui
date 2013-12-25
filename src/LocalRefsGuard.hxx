@@ -24,7 +24,7 @@ public:
      * Sprawdza czy @p o jest zainicjalizowany. Rzuca wyjątkiem jeśli nie jest.
      */
     template<typename T>
-    void check(const T& o);
+    void check(const T& o) const;
 
     /**
      * @brief Sprawdza czy ref nie jest null-em i umieszcza w obiekcie.
@@ -50,7 +50,7 @@ private:
 };
 
 template<typename T>
-void LocalRefsGuard::check(const T &o)
+void LocalRefsGuard::check(const T &o) const
 {
     if(!o)
         throw JvmException::fromEnv(_jniEnv);

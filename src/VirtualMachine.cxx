@@ -94,7 +94,14 @@ void VirtualMachine::start()
 
 void VirtualMachine::storePluginsSelection(const QStringList& selected, const QStringList& unselected)
 {
-    _stateMap->setPluginsSelection(_jniEnv,selected,unselected);
+    try
+    {
+        _stateMap->setPluginsSelection(_jniEnv,selected,unselected);
+    }
+    catch(const JvmException& e)
+    {
+        emit exceptionOccured(e);
+    }
 }
 
 void VirtualMachine::stop()

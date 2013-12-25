@@ -13,6 +13,9 @@ public:
 
 private:
     StateMap(JNIEnv *jniEnv, jobject stateMap);
+
+private:
+
 };
 
 #endif // STATEMAP_HXX
