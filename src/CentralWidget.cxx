@@ -19,7 +19,7 @@ void CentralWidget::vmInitializationFailed()
 
 void CentralWidget::handleVmAboutToStop()
 {
-    _state=State::initialization;
+    _state=State::teardown;
     _waitForVmWidget->handleVmAboutToStop();
     setCurrentWidget(_waitForVmWidget);
 }

@@ -15,7 +15,8 @@ public:
     void vmInitializationFailed();
     void handleVmAboutToStop();
     // Być może już gotowy, ponieważ otrzymano wcześniej żądanie wyświetlenia karty z treścią
-    void changeStateToReady();
+    void handleInitialized();
+    void handleInitializedEmpty();
 
 signals:
 
@@ -28,11 +29,12 @@ private:
 
     enum class State
     {
-        uninitialized,
-        initialization,
-        initializationFailed,
-        vmConnected,
-        vmDisconnected,
+        uninitialized,  // Stan początkowy
+        initialization, // Trwa inicjalizacja (GUI odbiera dane z JVM)
+        initializationFailed, // Inicjalizacja nie powiodła się (wyjątek JVM w trakcie inicjalizacji)
+        vmConnected,    // Wyświetla zachęte do wyboru widoku lub wybrane widoki (w kartach)
+        teardown,       // Trwa zamykanie aplikacji
+        vmDisconnected, // JVM zostało odłączone (potrzebne to?)
     } _state;
 };
 
