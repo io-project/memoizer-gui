@@ -68,12 +68,12 @@ void VirtualMachine::start()
     QByteArray classpath=("-Djava.class.path="+buildClasspath()).toLocal8Bit();
     JavaVMOption options[]={
     #ifndef NDEBUG
-        {"-verbose:class,gc,jni",nullptr},
-        {"-Xcheck:jni",nullptr},
+        {const_cast<char*>("-verbose:class,gc,jni"),nullptr},
+        {const_cast<char*>("-Xcheck:jni"),nullptr},
     #endif
-        {classpath.data()},
-        {"abort",&jvmAbort},
-        {"exit",&jvmExit},
+        {classpath.data(),nullptr},
+        {const_cast<char*>("abort"),reinterpret_cast<void*>(&jvmAbort)},
+        {const_cast<char*>("exit"),reinterpret_cast<void*>(&jvmExit)},
     };
 
     JavaVMInitArgs initArgs;

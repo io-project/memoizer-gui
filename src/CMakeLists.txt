@@ -7,6 +7,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed.
 set(CMAKE_AUTOMOC ON)
 
+if(CMAKE_HOST_UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
+
 find_package(Qt5Core 5.2 REQUIRED)
 find_package(Qt5Widgets 5.2 REQUIRED)
 
@@ -42,3 +46,6 @@ target_include_directories(MemoizerGui PRIVATE
     ${JAVA_INCLUDE_PATH2})
 
 target_link_libraries(MemoizerGui Qt5::Core Qt5::Widgets)
+if(NOT CMAKE_HOST_WIN32)
+    target_link_libraries(MemoizerGui ${JAVA_JVM_LIBRARY})
+endif()

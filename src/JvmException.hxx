@@ -14,8 +14,8 @@ public:
     explicit JvmException();
     explicit JvmException(const QString& message);
 
-    virtual const char* what() const override;
-    QString whatUnicode() const;
+    virtual const char* what() const noexcept override;
+    QString whatUnicode() const noexcept;
 
     static void checkEnv(JNIEnv *jniEnv);
     static JvmException fromEnv(JNIEnv *jniEnv);

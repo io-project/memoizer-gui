@@ -9,4 +9,8 @@ install_maven(java lib)
 
 add_executable(${PROJECT_NAME} WIN32 main.cxx)
 target_link_libraries(${PROJECT_NAME} MemoizerGui)
+if(NOT CMAKE_HOST_WIN32)
+    set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
+endif()
+
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
