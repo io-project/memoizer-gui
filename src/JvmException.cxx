@@ -3,13 +3,14 @@
 #include <list>
 #include <iostream>
 
-JvmException::JvmException() : std::runtime_error(nullptr)
+JvmException::JvmException() : std::runtime_error("")
 {
 
 }
 
 JvmException::JvmException(const QString &message) :
-    std::runtime_error(nullptr), _message(message),
+    std::runtime_error("Exception from JVM"),
+    _message(message),
     _localMessage(message.toLocal8Bit())
 {
 }
