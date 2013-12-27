@@ -14,6 +14,7 @@
 class VirtualMachine;
 class JvmException;
 class ViewType;
+class CentralWidget;
 
 typedef jint (JNICALL * CreateJavaVM_t)(JavaVM **, void **, void *);
 
@@ -24,13 +25,13 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     virtual ~MainWindow() override;
 
+    CentralWidget* centralWidget() const;
     void closeEvent(QCloseEvent* event) override;
 
 signals:
+    void virtualMachineInitialized(VirtualMachine* vm);
     void initialized();
     void initializedEmpty();  // Zainicjalizowano, ale nie ma plugin-ów
-
-public slots:
 
 private slots:
     /* Inicjalizacja GUI */
@@ -68,7 +69,6 @@ private:
     void showAbout();
     void showAccountsSettings();
     void showException(const JvmException &exception);
-    void showView(std::weak_ptr<const ViewType> viewType, const QStringList& pluginsNames);
 
     /* Funkcje pomocnicze */
     QStringList selectedSources() const;

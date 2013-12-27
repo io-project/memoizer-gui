@@ -45,6 +45,11 @@ MainWindow::~MainWindow()
 {
 }
 
+CentralWidget *MainWindow::centralWidget() const
+{
+    return static_cast<CentralWidget*>(QMainWindow::centralWidget());
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     _wantClose=true;
@@ -94,12 +99,13 @@ void MainWindow::initializeVirtualMachine()
     connect(_vm,&VirtualMachine::pluginsNames,this,&MainWindow::receivePluginsNames);
     connect(_vm,&VirtualMachine::viewsTypes,this,&MainWindow::receiveViewTypes);
     connect(_vm,&VirtualMachine::pluginsNamesForView,this,&MainWindow::receivePluginsNamesForView);
-    connect(_vm,&VirtualMachine::initializationFailed,dynamic_cast<CentralWidget*>(centralWidget()),&CentralWidget::vmInitializationFailed);
     connect(_vm,&VirtualMachine::aboutToStop,this,&MainWindow::handleVmAboutToStop);
     connect(_vm,&VirtualMachine::stopped,_vmThread,&QThread::quit);
     connect(_vm,&VirtualMachine::exceptionOccured,this,&MainWindow::showException);
     connect(_vmThread,&QThread::finished,this,&MainWindow::handleVmThreadFinished);
     _vmThread->start();
+
+    emit virtualMachineInitialized(_vm);
 }
 
 bool MainWindow::isReadyClose() const
@@ -110,7 +116,6 @@ bool MainWindow::isReadyClose() const
 void MainWindow::handleVmAboutToStop()
 {
     releaseAllPlugins();
-    dynamic_cast<CentralWidget*>(centralWidget())->handleVmAboutToStop();
 }
 
 void MainWindow::handleVmThreadFinished()
@@ -174,14 +179,14 @@ CreateJavaVM_t MainWindow::getCreateJavaVM()
 {
 #ifdef Q_OS_WIN
     QSettings settings;
-    QString jvmLibraryLocation=settings.value("jvmLibraryLocation").toString();
+#ifdef Q_OS_WIN64
+    const QString platform=QString::fromUtf8("x86_64");
+#elif Q_OS_WIN32
+    const QString platform=QString::fromUtf8("x86");
+#endif
+    QString jvmLibraryLocation=settings.value("jvmLibraryLocation"+platform).toString();
     if(jvmLibraryLocation.isEmpty())
         jvmLibraryLocation=getJvmLocationHint();
-#ifdef Q_OS_WIN64
-    QString platform=QString::fromUtf8("x86_64");
-#elif Q_OS_WIN32
-    QString platform=QString::fromUtf8("x86");
-#endif
     QFunctionPointer result;
     do
     {
@@ -219,7 +224,7 @@ CreateJavaVM_t MainWindow::getCreateJavaVM()
     } while(true);
     if(result)
     {
-        settings.setValue("jvmLibraryLocation",QDir::toNativeSeparators(jvmLibraryLocation));
+        settings.setValue("jvmLibraryLocation"+platform,QDir::toNativeSeparators(jvmLibraryLocation));
     }
     return reinterpret_cast<CreateJavaVM_t>(result);
 #else
@@ -262,16 +267,16 @@ void MainWindow::receivePluginsNamesForView(const QStringList &pluginsNames, std
     Q_ASSERT(viewTypeL);
     QMenu *viewMenu=_viewsMenu->addMenu(viewTypeL->getName());
     QAction *action=viewMenu->addAction(QString::fromUtf8("Zaznaczone źródła"));
-    connect(action,&QAction::triggered,this,[viewType,this](){showView(viewType,selectedSources());});
+    connect(action,&QAction::triggered,this,[viewType,this](){centralWidget()->showView(viewType,selectedSources());});
     viewMenu->addSeparator();
     for(auto plugin:pluginsNames)
     {
         action=viewMenu->addAction(plugin);
-        connect(action,&QAction::triggered,this,[this,plugin,viewType](){showView(viewType,QStringList(plugin));});
+        connect(action,&QAction::triggered,this,[this,plugin,viewType](){centralWidget()->showView(viewType,QStringList(plugin));});
     }
     viewMenu->addSeparator();
     action=viewMenu->addAction(QString::fromUtf8("Wszystko"));
-    connect(action,&QAction::triggered,this,[this,viewType,pluginsNames](){showView(viewType,pluginsNames);});
+    connect(action,&QAction::triggered,this,[this,viewType,pluginsNames](){centralWidget()->showView(viewType,pluginsNames);});
 
     _waitingViewTypes.erase(viewTypeL);
     if(_waitingViewTypes.empty())
@@ -301,6 +306,7 @@ void MainWindow::deselectAllSources()
 void MainWindow::releaseAllPlugins()
 {
     deselectAllSources();
+    menuBar()->setEnabled(false);
     for(QAction *action : _sourcesActions)
         _sourcesMenu->removeAction(action);
 }
@@ -325,15 +331,6 @@ void MainWindow::showException(const JvmException& exception)
     QMessageBox::critical(this,
                           QString::fromUtf8("Wystąpił wyjątek"),
                           exception.whatUnicode());
-}
-
-#include <QDebug>
-
-void MainWindow::showView(std::weak_ptr<const ViewType> viewType, const QStringList &pluginsNames)
-{
-    qDebug()<<"Widok:"<<viewType.lock()->getName();
-    for(const auto p : pluginsNames)
-        qDebug()<<p;
 }
 
 QStringList MainWindow::selectedSources() const

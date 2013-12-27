@@ -10,7 +10,7 @@ class WaitForVMWidget : public QWidget, private Ui::WaitForVMWidget
 public:
     explicit WaitForVMWidget(QWidget *parent = 0);
 
-    void handleVmAboutToStop();
+    void setVmAboutToStop();
 
 protected:
     void changeEvent(QEvent *e) override;

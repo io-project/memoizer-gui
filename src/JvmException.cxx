@@ -15,12 +15,12 @@ JvmException::JvmException(const QString &message) :
 {
 }
 
-const char *JvmException::what() const noexcept
+const char *JvmException::what() const Q_DECL_NOEXCEPT
 {
     return _localMessage;
 }
 
-QString JvmException::whatUnicode() const noexcept
+QString JvmException::whatUnicode() const Q_DECL_NOEXCEPT
 {
     return _message;
 }

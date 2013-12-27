@@ -35,10 +35,11 @@ public:
 
 signals:
     void started();
-    void objectsCreated();
+    void readyToUse();
     void pluginsNames(const QStringList& pluginsNames,const QStringList& selectedPlugins);
     void viewsTypes(const QList<std::weak_ptr<const ViewType>>& viewsTypes);
     void pluginsNamesForView(const QStringList& pluginsNames, std::weak_ptr<const ViewType> viewType);
+    void initializationComplete(bool havePlugins);
     void initializationFailed();
     void aboutToStop();
     void stopped();

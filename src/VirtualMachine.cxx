@@ -109,6 +109,20 @@ void VirtualMachine::stop()
     if(_javaVm)
     {
         emit aboutToStop();
+        try
+        {
+            _eventService->shutdown(_jniEnv);
+        }
+        catch(const JvmException& e)
+        {
+            emit exceptionOccured(e);
+        }
+        // Kasuje referencje do obiektów składowych
+        _pluginManager.reset();
+        _eventService.reset();
+        _stateMap.reset();
+        _allViewTypes.clear();
+
         _javaVm->DestroyJavaVM();
         emit stopped();
     }
@@ -214,7 +228,7 @@ void VirtualMachine::prepareCommonObjects()
     }
     // Stworzono obiekt pluginManager
     localRefs.removeAll();
-    emit objectsCreated();
+    emit readyToUse();
     prepareDataForGui();
 #undef check
 }
@@ -237,6 +251,7 @@ void VirtualMachine::prepareDataForGui()
             auto results=_pluginManager->getPluginsNamesForView(_jniEnv,viewType);
             emit pluginsNamesForView(results,viewType);
         }
+        emit initializationComplete(!pluginsNamesL.isEmpty());
     }
     catch(const JvmException& e)
     {

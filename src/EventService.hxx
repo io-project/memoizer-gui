@@ -6,6 +6,9 @@
 class EventService : public JvmObject<EventService>
 {
     friend class JvmObject<EventService>;
+public:
+    void shutdown(JNIEnv *jniEnv);
+
 private:
     EventService(JNIEnv *jniEnv, jobject eventService);
 };

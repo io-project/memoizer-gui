@@ -1,41 +1,52 @@
 #ifndef CENTRALWIDGET_HXX
 #define CENTRALWIDGET_HXX
 
+#include <memory>
+
 #include <QtWidgets/QStackedWidget>
 
 class WaitForVMWidget;
 class VmErrorWidget;
+class VirtualMachine;
+class MainWindow;
+class ViewType;
+class TabWidget;
+class MessageWidget;
 
 class CentralWidget : public QStackedWidget
 {
     Q_OBJECT
 public:
-    explicit CentralWidget(QWidget *parent = 0);
+    explicit CentralWidget(MainWindow *parent = 0);
 
-    void vmInitializationFailed();
-    void handleVmAboutToStop();
-    // Być może już gotowy, ponieważ otrzymano wcześniej żądanie wyświetlenia karty z treścią
-    void handleInitialized();
-    void handleInitializedEmpty();
+    void showView(std::weak_ptr<const ViewType> viewType, const QStringList &pluginsNames);
+
+    MainWindow* parent() const;
+
+    void setVirtualMachine(VirtualMachine* vm);
 
 signals:
 
-private slots:
-    void initialize();
+private:
+    // handle vm state
+    void handleVmInitializationComplete(bool havePlugins);
+    void handleVmInitializationFailed();
+    void handleVmAboutToStop();
+    // handle user requests
+    void hideTabWidget();
 
 private:
+    QWidget *_currentInfoWidget;
+    QWidget *_currentInteractionWidget;
+
     WaitForVMWidget* _waitForVmWidget;
     VmErrorWidget* _vmErrorWidget;
+    MessageWidget* _messageWidget;
+    TabWidget* _tabWidget;
 
-    enum class State
-    {
-        uninitialized,  // Stan początkowy
-        initialization, // Trwa inicjalizacja (GUI odbiera dane z JVM)
-        initializationFailed, // Inicjalizacja nie powiodła się (wyjątek JVM w trakcie inicjalizacji)
-        vmConnected,    // Wyświetla zachęte do wyboru widoku lub wybrane widoki (w kartach)
-        teardown,       // Trwa zamykanie aplikacji
-        vmDisconnected, // JVM zostało odłączone (potrzebne to?)
-    } _state;
+    VirtualMachine *_vm;
+    bool _vmReadyToUse;
+
 };
 
 #endif // CENTRALWIDGET_HXX

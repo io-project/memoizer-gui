@@ -32,11 +32,15 @@ set(SRC_LIST
     ViewTypeBuilder.cxx
     JvmClass.cxx
     Object.cxx
+    MessageWidget.cxx
+    TabWidget.cxx
+    ViewWidget.cxx
 )
 
 qt5_wrap_ui(UI_HDRS_LIST
     WaitForVMWidget.ui
     VmErrorWidget.ui
+    MessageWidget.ui
 )
 
 
