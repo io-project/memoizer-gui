@@ -246,7 +246,7 @@ void VirtualMachine::stop()
     }
 }
 
-static void JNICALL notifyUpdate(
+void JNICALL notifyUpdate(
         JNIEnv* jniEnv,
         jobject memoizerModelHandler,
         jobject meme,
@@ -287,7 +287,7 @@ static void JNICALL notifyUpdate(
     }
 }
 
-static void JNICALL notifyStreamEnd(
+void JNICALL notifyStreamEnd(
         JNIEnv* jniEnv,
         jobject memoizerModelHandler)
 {
