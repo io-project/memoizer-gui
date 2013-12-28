@@ -16,7 +16,7 @@ class MemoizerModelController : public JvmObject<MemoizerModelController>
 
 public:
     bool pull(JNIEnv *jniEnv, jint id);
-    Meme get(MemoizerModelController::JNIEnv *JNIEnv, const MemeBuilder& memeBuilder, jint id);
+    Meme get(JNIEnv *JNIEnv, const MemeBuilder& memeBuilder, jint id);
 
 private:
     MemoizerModelController(JNIEnv *jniEnv, const jobject& object);

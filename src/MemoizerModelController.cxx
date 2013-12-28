@@ -16,8 +16,6 @@ bool MemoizerModelController::pull(JNIEnv* jniEnv, jint id)
     return result;
 }
 
-#include <QDebug>
-
 Meme MemoizerModelController::get(JNIEnv* jniEnv, const MemeBuilder &memeBuilder, jint id)
 {
     LocalRefsGuard localRefs(jniEnv);
