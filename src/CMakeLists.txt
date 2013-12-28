@@ -13,6 +13,7 @@ endif()
 
 find_package(Qt5Core 5.2 REQUIRED)
 find_package(Qt5Widgets 5.2 REQUIRED)
+find_package(Qt5Network 5.2 REQUIRED)
 
 set(SRC_LIST
     Core.cxx
@@ -35,12 +36,24 @@ set(SRC_LIST
     MessageWidget.cxx
     TabWidget.cxx
     ViewWidget.cxx
+    ModelViewWidget.cxx
+    Meme.cxx
+    MemoizerModel.cxx
+    MemeProcessor.cxx
+    MemeImageWidget.cxx
+    MemeWidget.cxx
+    MetadataHandler.cxx
+    MemoizerModelController.cxx
+    MemeBuilder.cxx
+    MemoizerModelBuilder.cxx
 )
 
 qt5_wrap_ui(UI_HDRS_LIST
     WaitForVMWidget.ui
     VmErrorWidget.ui
     MessageWidget.ui
+    ViewWidget.ui
+    MemeWidget.ui
 )
 
 
@@ -49,7 +62,7 @@ target_include_directories(MemoizerGui PRIVATE
     ${JAVA_INCLUDE_PATH}
     ${JAVA_INCLUDE_PATH2})
 
-target_link_libraries(MemoizerGui Qt5::Core Qt5::Widgets)
+target_link_libraries(MemoizerGui Qt5::Core Qt5::Widgets Qt5::Network)
 if(NOT CMAKE_HOST_WIN32)
     target_link_libraries(MemoizerGui ${JAVA_JVM_LIBRARY})
 endif()

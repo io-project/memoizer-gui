@@ -7,6 +7,8 @@
 #include "MainWindow.hxx"
 #include "JvmException.hxx"
 #include "ViewType.hxx"
+#include "MemoizerModel.hxx"
+#include "Meme.hxx"
 
 Core::Core()
 {
@@ -28,4 +30,8 @@ void Core::registerMetaTypes()
     qRegisterMetaType<JvmException>();
     qRegisterMetaType<std::weak_ptr<const ViewType>>();
     qRegisterMetaType<QList<std::weak_ptr<const ViewType>>>();
+    qRegisterMetaType<std::size_t>("std::size_t");
+    qRegisterMetaType<MemoizerModel*>();
+    qRegisterMetaType<jint>("jint");
+    qRegisterMetaType<Meme>();
 }

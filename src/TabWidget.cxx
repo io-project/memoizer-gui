@@ -17,10 +17,11 @@ void TabWidget::showView(VirtualMachine* vm, std::weak_ptr<const ViewType> viewT
     if(!viewTypeL)
         return;
 
-    ViewWidget *viewWidget=new ViewWidget(vm,viewType,pluginsNames,this);
+    ViewWidget *viewWidget=new ViewWidget(vm,viewTypeL,pluginsNames,this);
 
     int i=addTab(viewWidget,viewTypeL->getName()+": "+pluginsNames.join(", "));
     setCurrentIndex(i);
+    viewWidget->handleFocus();
 }
 
 ViewWidget *TabWidget::widget(int index) const
@@ -43,6 +44,7 @@ void TabWidget::handleTabCloseRequest(int index)
     ViewWidget *viewWidget=widget(index);
     Q_CHECK_PTR(viewWidget);
     viewWidget->releaseVm();
+    viewWidget->deleteLater();
     removeTab(index);
     if(count()==0)
         emit lastTabClosed();

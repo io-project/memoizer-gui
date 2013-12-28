@@ -24,6 +24,11 @@ void MessageWidget::setInitializedEmptyMessage()
                        .canonicalPath()));
 }
 
+void MessageWidget::setWaitingForSearchKey()
+{
+    label->setText(QString::fromUtf8("Wprowadź hasło wyszukiwania i wciśnij Enter"));
+}
+
 void MessageWidget::changeEvent(QEvent *e)
 {
     QWidget::changeEvent(e);

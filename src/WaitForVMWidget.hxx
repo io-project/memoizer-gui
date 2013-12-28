@@ -11,6 +11,11 @@ public:
     explicit WaitForVMWidget(QWidget *parent = 0);
 
     void setVmAboutToStop();
+    void setWaitingForModel();
+    void setWaitingForImage();
+    void setWaitingForData();
+
+    void setProgress(qint64 current,qint64 total);
 
 protected:
     void changeEvent(QEvent *e) override;

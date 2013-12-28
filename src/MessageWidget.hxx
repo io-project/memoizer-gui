@@ -12,6 +12,7 @@ public:
 
     void setWaitingForViewMessage();
     void setInitializedEmptyMessage();
+    void setWaitingForSearchKey();
 
 protected:
     void changeEvent(QEvent *e);
