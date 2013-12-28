@@ -23,7 +23,8 @@ void MemeImageWidget::setMemeProcessor(MemeProcessor *memeProcessor)
     if(reply->isFinished())
     {
         QLabel *imageLabel=new QLabel();
-        imageLabel->setPixmap(QPixmap::fromImageReader(&QImageReader(reply)));
+        QImageReader reader(reply);
+        imageLabel->setPixmap(QPixmap::fromImageReader(&reader));
         _layout->addWidget(imageLabel,1);
     }
     else
@@ -36,7 +37,8 @@ void MemeImageWidget::setMemeProcessor(MemeProcessor *memeProcessor)
             _layout->removeWidget(widget);
             widget->deleteLater();
             QLabel *imageLabel=new QLabel();
-            imageLabel->setPixmap(QPixmap::fromImageReader(&QImageReader(reply)));
+            QImageReader reader(reply);
+            imageLabel->setPixmap(QPixmap::fromImageReader(&reader));
             _layout->addWidget(imageLabel,1);
         });
     }
