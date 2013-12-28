@@ -84,6 +84,7 @@ void ModelViewWidget::testAndHandleAtDown()
     {
         _havePlaceholderInView=true;
         _layout->addWidget(_placeholderWidget);
+        _placeholderWidget->show();
     }
     //_compositeWidget->resize(_compositeWidget->sizeHint());
 }
@@ -97,6 +98,7 @@ void ModelViewWidget::tryToRemovePlaceholder()
     _layout->removeWidget(_placeholderWidget);
     _placeholderWidget->setParent(nullptr);
     _havePlaceholderInView=false;
+    _placeholderWidget->hide();
     _layout->addWidget(prepareMemeWidget());
     //_compositeWidget->resize(_compositeWidget->sizeHint());
 
