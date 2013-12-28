@@ -181,7 +181,7 @@ CreateJavaVM_t MainWindow::getCreateJavaVM()
     QSettings settings;
 #ifdef Q_OS_WIN64
     const QString platform=QString::fromUtf8("x86_64");
-#elif Q_OS_WIN32
+#elif defined Q_OS_WIN32
     const QString platform=QString::fromUtf8("x86");
 #endif
     QString jvmLibraryLocation=settings.value("jvmLibraryLocation"+platform).toString();

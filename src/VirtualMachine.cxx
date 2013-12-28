@@ -202,6 +202,8 @@ void VirtualMachine::pull(MemoizerModel *model, jint id)
 
 void VirtualMachine::storePluginsSelection(const QStringList& selected, const QStringList& unselected)
 {
+    if(Q_UNLIKELY(!_jniEnv))
+        return;
     try
     {
         _stateMap->setPluginsSelection(_jniEnv,selected,unselected);
@@ -242,8 +244,8 @@ void VirtualMachine::stop()
         }
 
         //_javaVm->DestroyJavaVM(); // FIXME: Zamknąć czysto JVM
-        emit stopped();
     }
+    emit stopped();
 }
 
 void JNICALL notifyUpdate(
