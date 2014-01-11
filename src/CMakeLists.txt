@@ -46,6 +46,7 @@ set(SRC_LIST
     MemoizerModelController.cxx
     MemeBuilder.cxx
     MemoizerModelBuilder.cxx
+    FacebookSharer.cxx
 )
 
 qt5_wrap_ui(UI_HDRS_LIST

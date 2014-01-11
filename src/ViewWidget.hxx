@@ -32,6 +32,8 @@ private:
     QWidget* _focusWidget;
     QWidget* _interactionWidget;
     std::size_t _modelRequestId;
+
+    VirtualMachine* _vm;
 };
 
 #endif // VIEWWIDGET_HXX

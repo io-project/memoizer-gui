@@ -1,5 +1,7 @@
 #include "ModelViewWidget.hxx"
 
+#include <QtCore/QTimer>
+
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QScrollBar>
@@ -10,10 +12,10 @@
 #include "WaitForVMWidget.hxx"
 #include "Meme.hxx"
 
-ModelViewWidget::ModelViewWidget(MemoizerModel *model, QWidget *parent) :
+ModelViewWidget::ModelViewWidget(MemoizerModel *model,VirtualMachine* vm, QWidget *parent) :
     QScrollArea(parent),_visibleMemeCount(0),
     _collectedMemeCount(0) , _model(model), _modelIsDead(false),
-    _havePlaceholderInView(false)
+    _havePlaceholderInView(false), _vm(vm)
 {
     setWidgetResizable(true);
 
@@ -83,10 +85,10 @@ void ModelViewWidget::testAndHandleAtDown()
     else
     {
         _havePlaceholderInView=true;
-        _layout->addWidget(_placeholderWidget);
+        _layout->addWidget(_placeholderWidget,1);
         _placeholderWidget->show();
     }
-    //_compositeWidget->resize(_compositeWidget->sizeHint());
+    QTimer::singleShot(0,this,SLOT(testAndHandleAtDown()));
 }
 
 void ModelViewWidget::tryToRemovePlaceholder()
@@ -100,15 +102,14 @@ void ModelViewWidget::tryToRemovePlaceholder()
     _havePlaceholderInView=false;
     _placeholderWidget->hide();
     _layout->addWidget(prepareMemeWidget());
-    //_compositeWidget->resize(_compositeWidget->sizeHint());
 
-    //testAndHandleAtDown(); // Być może trzeba asynchronicznie, żeby widget zdążył zająć miejsce. (albo w ogóle, bo modyfikacja widgetu spowoduje pojawienie się sygnału...)
+    QTimer::singleShot(0,this,SLOT(testAndHandleAtDown()));
 }
 
 MemeWidget *ModelViewWidget::prepareMemeWidget()
 {
     Q_ASSERT(_visibleMemeCount<_collectedMemeCount);
-    MemeWidget* result=new MemeWidget(_memes[_visibleMemeCount++]);
+    MemeWidget* result=new MemeWidget(_memes[_visibleMemeCount++],_vm);
     if(_visibleMemeCount+_cacheSize>_collectedMemeCount)
         if(Q_LIKELY(!_modelIsDead))
             _model->pull(_collectedMemeCount);

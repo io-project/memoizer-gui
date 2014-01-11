@@ -2,14 +2,24 @@
 
 #include "MemeProcessor.hxx"
 #include "Meme.hxx"
+#include "VirtualMachine.hxx"
 
-MemeWidget::MemeWidget(MemeProcessor *memeProcessor, QWidget *parent) :
+MemeWidget::MemeWidget(MemeProcessor *memeProcessor, VirtualMachine *vm, QWidget *parent) :
     QWidget(parent)
 {
     setupUi(this);
     titleLabel->setText(memeProcessor->meme().title());
     descriptionLabel->setText(memeProcessor->meme().description());
     imageWidget->setMemeProcessor(memeProcessor);
+
+    QUrl imageUrl=memeProcessor->meme().imageLink();
+    connect(sharePushButton,&QPushButton::clicked,this,[imageUrl,vm]{
+        QMetaObject::invokeMethod(
+                    vm,
+                    "shareOnFacebook",
+                    Qt::QueuedConnection,
+                    Q_ARG(QUrl,imageUrl));
+    });
 }
 
 void MemeWidget::changeEvent(QEvent *e)

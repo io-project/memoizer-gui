@@ -19,6 +19,7 @@
 #include "MemoizerModelController.hxx"
 #include "MemeBuilder.hxx"
 #include "Meme.hxx"
+#include "FacebookSharer.hxx"
 
 static VirtualMachine* vmInstance=nullptr;
 
@@ -231,6 +232,8 @@ void VirtualMachine::stop()
         _pluginManager.reset();
         _eventService.reset();
         _stateMap.reset();
+        _metadataHandler.reset();
+        _facebookSharer.reset();
         _allViewTypes.clear();
         delete _modelBuilder;
         _modelBuilder=nullptr;
@@ -246,6 +249,18 @@ void VirtualMachine::stop()
         //_javaVm->DestroyJavaVM(); // FIXME: Zamknąć czysto JVM
     }
     emit stopped();
+}
+
+void VirtualMachine::shareOnFacebook(const QUrl &url)
+{
+    try
+    {
+        _facebookSharer->share(_jniEnv,url);
+    }
+    catch(const JvmException& e)
+    {
+        emit exceptionOccured(e);
+    }
 }
 
 void JNICALL notifyUpdate(
@@ -455,7 +470,7 @@ void VirtualMachine::prepareCommonObjects()
                     "J");
         check(_memoizerModelHandlerIdId);
         _memeBuilder=new MemeBuilder(_jniEnv);
-
+        _facebookSharer=std::make_shared<FacebookSharer>(_jniEnv);
         registerNatives();
 
         emit readyToUse();

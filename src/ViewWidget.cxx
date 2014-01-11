@@ -12,7 +12,7 @@ ViewWidget::ViewWidget(VirtualMachine* vm,
                        std::shared_ptr<const ViewType> viewType,
                        const QStringList &pluginsNames,
                        QWidget *parent)
-    : QWidget(parent), _modelRequestId(0), _focusWidget(nullptr)
+    : QWidget(parent), _modelRequestId(0), _focusWidget(nullptr), _vm(vm)
 {
     setupUi(this);
 
@@ -47,7 +47,7 @@ void ViewWidget::receiveModel(MemoizerModel *model,std::size_t requestId)
         return;
     verticalLayout->removeWidget(_interactionWidget);
     _interactionWidget->deleteLater();
-    _interactionWidget=new ModelViewWidget(model,this);
+    _interactionWidget=new ModelViewWidget(model,_vm,this);
     verticalLayout->addWidget(_interactionWidget,1);
 }
 
