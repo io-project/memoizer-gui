@@ -6,11 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>129</width>
-    <height>128</height>
+    <width>346</width>
+    <height>130</height>
    </rect>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,1,0">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,1,0,0">
+   <item row="2" column="1">
+    <widget class="MemeImageWidget" name="imageWidget" native="true"/>
+   </item>
    <item row="1" column="2">
     <spacer name="horizontalSpacer">
      <property name="orientation">
@@ -24,27 +27,18 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="1">
-    <widget class="QLabel" name="descriptionLabel">
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
      </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QPushButton" name="sharePushButton">
-     <property name="text">
-      <string>Udostępnij na Facebook'u</string>
-     </property>
-    </widget>
+    </spacer>
    </item>
    <item row="0" column="1">
     <widget class="QLabel" name="titleLabel">
@@ -61,21 +55,38 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="MemeImageWidget" name="imageWidget" native="true"/>
+   <item row="1" column="1">
+    <widget class="QLabel" name="descriptionLabel">
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
-   <item row="1" column="0">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="shareOnTwitterPushButton">
+       <property name="text">
+        <string>Udostępnij na Twitter'ze</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="sharePushButton">
+       <property name="text">
+        <string>Udostępnij na Facebook'u</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

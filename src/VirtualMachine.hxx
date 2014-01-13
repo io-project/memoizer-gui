@@ -22,7 +22,7 @@ class MemoizerModelBuilder;
 class JvmClass;
 class MemeBuilder;
 class Meme;
-class FacebookSharer;
+class MetaSharer;
 
 class VirtualMachine : public QObject
 {
@@ -54,6 +54,7 @@ public:
     Q_INVOKABLE void stop();
 
     Q_INVOKABLE void shareOnFacebook(const QUrl& url);
+    Q_INVOKABLE void shareOnTwitter(const QUrl& url);
 
 signals:
     void started();
@@ -83,7 +84,7 @@ private:
     std::shared_ptr<EventService> _eventService;
     std::shared_ptr<PluginManager> _pluginManager;
     std::shared_ptr<MetadataHandler> _metadataHandler;
-    std::shared_ptr<FacebookSharer> _facebookSharer;
+    std::shared_ptr<MetaSharer> _metaSharer;
 
     jlong _nextId;
     std::unordered_map<MemoizerModel*,jlong> _memoizerModelToHandlerId;

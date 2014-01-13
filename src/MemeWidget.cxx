@@ -20,6 +20,13 @@ MemeWidget::MemeWidget(MemeProcessor *memeProcessor, VirtualMachine *vm, QWidget
                     Qt::QueuedConnection,
                     Q_ARG(QUrl,imageUrl));
     });
+    connect(shareOnTwitterPushButton,&QPushButton::clicked,this,[imageUrl,vm]{
+        QMetaObject::invokeMethod(
+                    vm,
+                    "shareOnTwitter",
+                    Qt::QueuedConnection,
+                    Q_ARG(QUrl,imageUrl));
+    });
 }
 
 void MemeWidget::changeEvent(QEvent *e)
