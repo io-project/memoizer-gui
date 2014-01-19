@@ -151,16 +151,19 @@ void MainWindow::initializeMoreMenu(QMenu *moreMenu)
     QAction* helpAction=moreMenu->addAction(
                 QIcon::fromTheme(QString::fromUtf8("help-contents")),
                 QString::fromUtf8("&Pomoc"));
+    helpAction->setEnabled(false);
     connect(helpAction,&QAction::triggered,this,&MainWindow::showHelp);
 
     QAction* aboutAction=moreMenu->addAction(
                 QIcon::fromTheme(QString::fromUtf8("help-about")),
                 QString::fromUtf8("O progr&amie"));
     aboutAction->setMenuRole(QAction::AboutRole);
+    aboutAction->setEnabled(false);
     connect(aboutAction,&QAction::triggered,this,&MainWindow::showAbout);
 
     QAction* accountAction=moreMenu->addAction(
                 QString::fromUtf8("&Konto"));
+    accountAction->setEnabled(false);
     connect(accountAction,&QAction::triggered,this,&MainWindow::showAccountsSettings);
 }
 

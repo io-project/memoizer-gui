@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>166</width>
+    <width>193</width>
     <height>50</height>
    </rect>
   </property>
@@ -31,6 +31,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="upButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="arrowType">
         <enum>Qt::UpArrow</enum>
        </property>
@@ -54,6 +57,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="leftButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="arrowType">
         <enum>Qt::LeftArrow</enum>
        </property>
@@ -61,6 +67,9 @@
      </item>
      <item>
       <widget class="QToolButton" name="rightButton">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="arrowType">
         <enum>Qt::RightArrow</enum>
        </property>
